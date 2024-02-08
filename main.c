@@ -1,47 +1,45 @@
+
 #include <stdio.h>
-#include "lista.h"
+#include "tad.h"
 
 int main() {
-    Lista listaOriginal;
-    listaOriginal.frente = NULL;
-    listaOriginal.tras = NULL;
+    Pilha torreA, torreB, torreC;
+    Fila filaJogadores;
+    int pontuacoes[MAX_MONGES];
+    int i;
 
-    Lista listaPares;
-    listaPares.frente = NULL;
-    listaPares.tras = NULL;
+    inicializarPilha(&torreA);
+    inicializarPilha(&torreB);
+    inicializarPilha(&torreC);
+    inicializarFila(&filaJogadores);
 
-    Lista listaImpares;
-    listaImpares.frente = NULL;
-    listaImpares.tras = NULL;
+    int numMonges;
+    printf("Informe a quantidade de monges: ");
+    scanf("%d", &numMonges);
 
-    int numero;
-
-    printf("Digite numeros inteiros ou 0 para sair:\n");
-
-    while (1) {
-        scanf("%d", &numero);
-
-        if (numero == 0) {
-            break;
-        }
-
-        adicionar(&listaOriginal, numero);
+    for (i = MAX_DISCOS; i > 0; i--) {
+        empilhar(&torreA, i);
     }
 
-    printf("Lista Original:\n");
-    exibirLista(listaOriginal.frente);
+    for (i = 1; i <= numMonges; i++) {
+        char nome[20];
+        escolherNomeMonge(nome);
+        enfileirar(&filaJogadores, nome);
+    }
 
-    dividirLista(&listaOriginal, &listaPares, &listaImpares);
+    while (filaJogadores.frente != -1) {
+        char nomeJogador[20];
+        strcpy(nomeJogador, desenfileirar(&filaJogadores));
+        int discosColocados = 0, discosRetirados = 0;
 
-    printf("Lista de Numeros Pares:\n");
-    exibirLista(listaPares.frente);
+        printf("\nJogador: %s\n", nomeJogador);
 
-    printf("Lista de Numeros Impares:\n");
-    exibirLista(listaImpares.frente);
+        hanoiComEscolha(MAX_DISCOS, &torreA, &torreB, nomeJogador, &discosColocados, &discosRetirados, &torreA, &torreB, &torreC);
 
-    liberarLista(&listaOriginal);
-    liberarLista(&listaPares);
-    liberarLista(&listaImpares);
+        pontuacoes[filaJogadores.frente] = calcularPontuacao(discosColocados, discosRetirados);
+
+        printf("Pontuação final de %s: %d\n", nomeJogador, pontuacoes[filaJogadores.frente]);
+    }
 
     return 0;
 }
